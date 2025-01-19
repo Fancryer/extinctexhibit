@@ -1,0 +1,31 @@
+server.port: 6060
+
+spring:
+  application:
+    name: extinctexhibit
+    admin.enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/extinct_exhibit
+    username: postgres
+    password: pg
+  jpa:
+    hibernate.ddl-auto: update
+    database: postgresql
+    properties.hibernate:
+      format_sql: true
+      use_sql_comments: true
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: c07176d5a286b2
+    password: 45ce5090f329be
+
+jwt:
+  key:
+    MIHcAgEBBEIBTtS6VjSDnI4eU+n61KGSRpbC0smWZwMXYv1F1T1m/DwZV88BLr6C
+    OcPc9e0F193jmSirZ723Vjwm4KfLEUwwUYygBwYFK4EEACOhgYkDgYYABAEH/EcX
+    p6puu/UAEseoRZSFHjDYgiQ89/h/EL4g5HGbmGs+qEfOsepbdFeFZ56gVQt/OS/l
+    p2MVg+wrIbmJ4hpucACZQBPjGKmf6/idKW5GXocLvjKAFiDa+LXrf0vszfX+kitt
+    aDApfBevWBAyzYnKiUfC7+zWm6MO2DXj638iNG/q9Q==
+  access-token-expiration: 3600000
+  refresh-token-expiration: 86400000
