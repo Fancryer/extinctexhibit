@@ -1,5 +1,6 @@
 package com.fancryer.extinctexhibit.entities
 
+import com.fancryer.extinctexhibit.dtos.CommentDto
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.CreationTimestamp
@@ -46,5 +47,14 @@ class Comment:Serializable
 	companion object
 	{
 		private const val serialVersionUID=-8232954632943433810L
+
+		val Comment.dto:CommentDto
+			get()=CommentDto(
+				id!!,
+				user!!.id!!,
+				user!!.prosoponym!!,
+				content!!,
+				createdAt!!
+			)
 	}
 }

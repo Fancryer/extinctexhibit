@@ -8,6 +8,7 @@ interface FileInputProps
 	name:string,
 	accept?:string,
 	onChange?:(file:File|null)=>void,
+	defaultValue?:File,
 	register:(
 		name:'cover',
 		options?:RegisterOptions<CreateNewsFormState,'cover'>
@@ -37,10 +38,19 @@ const getAverageRgb=
 		});
 
 const FileInput:FC<FileInputProps>=(
-	{label,name,accept='image/jpg,image/jpeg,image/png,image/webp,image/gif',onChange,register,errors,setValue}:FileInputProps
+	{
+		label,
+		name,
+		accept='image/jpg,image/jpeg,image/png,image/webp,image/gif',
+		onChange,
+		register,
+		errors,
+		setValue,
+		defaultValue
+	}:FileInputProps
 )=>{
 	const [canvas,_]=useState<CanvasRenderingContext2D|null>(document.createElement('canvas').getContext('2d'));
-	const [selectedFile,setSelectedFile]=useState<File|null>(null);
+	const [selectedFile,setSelectedFile]=useState<File|null>(defaultValue||null);
 	const [dragging,setDragging]=useState(false);
 	const [filePreview,setFilePreview]=useState<string|null>(null);
 	const [averageColor,setAverageColor]=useState<Uint8ClampedArray|null>(null);

@@ -1,10 +1,12 @@
 package com.fancryer.extinctexhibit.entities
 
 import jakarta.persistence.*
-import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
-import org.hibernate.annotations.*
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
+import org.hibernate.annotations.UpdateTimestamp
 import java.io.Serializable
 import java.time.Instant
 
@@ -13,7 +15,8 @@ import java.time.Instant
 class NewsCover:Serializable
 {
 	@Id
-	@ColumnDefault("nextval('news_covers_id_seq')")
+	@GeneratedValue(strategy=GenerationType.SEQUENCE,generator="news_covers_id_gen")
+	@SequenceGenerator(name="news_covers_id_gen",sequenceName="news_covers_id_seq",allocationSize=1)
 	@Column(name="id",nullable=false)
 	var id:Long?=null
 

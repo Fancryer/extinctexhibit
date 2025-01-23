@@ -1,11 +1,12 @@
 import {Config} from 'ziggy-js';
+import Cookies  from "js-cookie";
 
 export interface User
 {
 	id:number,
 	prosoponym:string,
 	email:string,
-	email_verified_at:string|null
+	emailVerifiedAt:string|null
 }
 
 export interface Auth
@@ -61,6 +62,16 @@ export interface Event
 	end_time:string
 }
 
+export interface NewsItem
+{
+	id:number,
+	title:string,
+	content:string,
+	createdAt:string,
+	updatedAt:string,
+	coverUrl?:string
+}
+
 /*
 id
 user_id
@@ -72,9 +83,14 @@ updated_at
 export interface Comment
 {
 	id:number,
-	owner_id:number,
-	owner_name:string,
-	news_id:number,
+	ownerId:number,
+	ownerProsoponym:string,
 	content:string,
-	created_at:string
+	createdAt:string
+}
+
+export interface RequestWithPayload<T>
+{
+	accessToken:string,
+	payload:T
 }

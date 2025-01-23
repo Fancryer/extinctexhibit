@@ -10,8 +10,8 @@ interface AuthProviderProps
 }
 
 const UNINIT_AUTH={user:null,roles:[]}
-export const EMPTY_AUTH:MaybeAuth={...UNINIT_AUTH,state:'unloaded'};
-export const FAILED_AUTH:MaybeAuth={...UNINIT_AUTH,state:'failed'};
+export const EMPTY_AUTH=():MaybeAuth=>({...UNINIT_AUTH,state:'unloaded'});
+export const FAILED_AUTH=():MaybeAuth=>({...UNINIT_AUTH,state:'failed'});
 
 interface AuthContext
 {
@@ -19,22 +19,25 @@ interface AuthContext
 	clearAuth:()=>void
 }
 
-const AuthContext=createContext<AuthContext>({
-												 auth:EMPTY_AUTH,clearAuth:()=>{
+const AuthContext=createContext<AuthContext>(
+	{
+		auth:     EMPTY_AUTH(),
+		clearAuth:()=>{
+		}
 	}
-											 });
+);
 
 export const useAuth=()=>useContext(AuthContext);
 
 export function AuthProvider({children,elseRedirectToLogin=false}:AuthProviderProps)
 {
-	const [auth,setAuth]=useState<MaybeAuth>(EMPTY_AUTH);
-	const clearAuth=()=>setAuth(EMPTY_AUTH);
+	const [auth,setAuth]=useState<MaybeAuth>(EMPTY_AUTH());
+	const clearAuth=()=>setAuth(EMPTY_AUTH());
 	const router=useRouter();
 
 	useEffect(()=>{
 		(async()=>{
-			setAuth({...EMPTY_AUTH,state:'loading'});
+			setAuth({...EMPTY_AUTH(),state:'loading'});
 			try
 			{
 				await getAuth(router,elseRedirectToLogin).then(
@@ -46,7 +49,7 @@ export function AuthProvider({children,elseRedirectToLogin=false}:AuthProviderPr
 			catch(error)
 			{
 				console.error('Auth loading failed:',error);
-				setAuth(FAILED_AUTH);
+				setAuth(FAILED_AUTH());
 			}
 		})();
 	},[]);

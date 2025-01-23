@@ -57,21 +57,15 @@ class AuthenticationService(
 			val currentUserDetails=userDetailsService.loadUserByUsername(it)
 			currentUserDetails.username.let {
 				usersRoleRepository.findByUser_Email(it)
-			}.also {roles->
-				println("Found roles: $roles for user $it")
 			}
 		}.orEmpty()
 	}
 
-	private fun createAccessToken(user:UserDetails)=tokenService.generate(
-		userDetails=user,
-		expirationDate=getAccessTokenExpiration()
-	)
+	private fun createAccessToken(user:UserDetails)=
+		tokenService.generate(user,getAccessTokenExpiration())
 
-	private fun createRefreshToken(user:UserDetails)=tokenService.generate(
-		userDetails=user,
-		expirationDate=getRefreshTokenExpiration()
-	)
+	private fun createRefreshToken(user:UserDetails)=
+		tokenService.generate(user,getRefreshTokenExpiration())
 
 	private fun getAccessTokenExpiration():Date=
 		Date(System.currentTimeMillis()+jwtProperties.accessTokenExpiration)

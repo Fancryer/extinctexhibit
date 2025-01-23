@@ -17,10 +17,7 @@ class VerificationController(
 		return emailService.sendVerificationEmail(accessToken)
 			.fold({(status,message)->
 				ResponseEntity.status(status).body(message)
-			}
-			) {
-				ResponseEntity.ok("")
-			}
+			}) {ResponseEntity.ok("")}
 	}
 
 	@PutMapping("/verify")

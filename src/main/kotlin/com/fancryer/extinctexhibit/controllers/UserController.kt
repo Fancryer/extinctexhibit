@@ -58,14 +58,24 @@ class UserController(
 			throw ResponseStatusException(NOT_FOUND,"User not found.")
 
 	@PostMapping("/add-role")
-	fun addRole(@RequestBody request:UserRequest<Long>):(ResponseEntity<List<String>>)
-	{
-		return tokenService.extractEmail(request.accessToken)?.let {email->
+	fun addRole(@RequestBody request:UserRequest<Long>):(ResponseEntity<List<String>>)=
+		tokenService.extractEmail(request.accessToken)?.let {email->
 			userService.addRole(email,request.payload)
 				.fold({throw BadRequestException(it.message)}) {
 					ResponseEntity.ok(it)
 				}
 		} ?: throw NotFoundException()
+
+	@PutMapping("/update-prosoponym-email")
+	fun update(@RequestBody request:UserRequest<ProsoponymEmail>):ResponseEntity<Boolean>
+	{
+		val email=tokenService.extractEmail(request.accessToken)
+				  ?: return ResponseEntity.status(NOT_FOUND).body(false)
+		return request.payload.let {(newEmail,newProsoponym)->
+			userService.updateProsoponymEmail(email,newEmail,newProsoponym)
+		}.let {
+			ResponseEntity.status(it).body(true)
+		}
 	}
 
 	private fun User.toResponse():CreateUserResponse=
@@ -80,3 +90,5 @@ class UserController(
 }
 
 data class UserRequest<Payload>(val accessToken:String,val payload:Payload)
+
+data class ProsoponymEmail(val email:String,val prosoponym:String)

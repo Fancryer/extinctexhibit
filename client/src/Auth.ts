@@ -66,7 +66,7 @@ export default async function getAuth(
 	if(!accessToken)
 	{
 		// Редирект выполнен в refreshToken
-		if(!await refreshToken(router,elseRedirectToLogin)) return EMPTY_AUTH;
+		if(!await refreshToken(router,elseRedirectToLogin)) return EMPTY_AUTH();
 	}
 	try
 	{

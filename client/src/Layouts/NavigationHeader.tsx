@@ -30,10 +30,7 @@ export default function NavigationHeader({user,roles,state}:MaybeAuth)
 			<HeaderLink name="/news" text={'News'}/>
 			<HeaderLink name="/halls" text={'Halls'}/>
 			<HeaderLink name="/events" text={'Events'}/>
-			{
-				userCanViewParticipants
-				&&<HeaderLink name="/" /*participants.index*/ text={'Participants'}/>
-			}
+			{userCanViewParticipants&&<HeaderLink name="/participants" text={'Participants'}/>}
 			{
 				userCanViewUsers
 				&&<HeaderLink name="/" /*users.index*/ text={'Users'}/>

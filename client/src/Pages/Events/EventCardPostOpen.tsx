@@ -1,12 +1,5 @@
-import {Description,Dialog,DialogPanel,DialogTitle}                  from '@headlessui/react';
-import {ChangeEventHandler,MouseEventHandler,ReactElement,useEffect} from 'react';
-import {useState}                                                    from 'react';
-import {Auth,Comment,Hall,Event}                                     from '@/types';
-// import {Link,router,useForm}     from '@inertiajs/react';
-import {useForm}                                                     from 'react-hook-form';
-import {Filter}                                                      from 'bad-words';
-import {hasPermissionInRoles}                                        from '@/Pages/FindPermissionsInRoles';
-import axios                                                         from 'axios';
+import {Description,Dialog,DialogPanel,DialogTitle} from '@headlessui/react';
+import {Auth,Event,Hall}                            from '../../types';
 
 
 interface EventCardPostOpenProps
@@ -21,80 +14,8 @@ interface EventCardPostOpenProps
 	description:string,
 	startTime:string,
 	endTime:string,
-	userCanCreateComments:boolean,
 	participates:boolean,
 	canParticipate:boolean
-}
-
-interface CommentSectionProps
-{
-	userCanCreateComments:boolean,
-	value:string,
-	onChange:ChangeEventHandler<HTMLTextAreaElement>,
-	onClick:()=>void,
-	comments:Comment[],
-	element:(comment:Comment)=>ReactElement
-}
-
-/*
-<CommentSection
-	userCanCreateComments={userCanCreateComments}
-	value={newComment}
-	onChange={(e)=>setNewComment(e.target.value)}
-	onClick={handleCommentSubmit}
-	comments={comments}
-	element={(comment)=>(
-		<div
-			key={comment.id}
-			className="p-4 rounded-md shadow-md bg-gray-100 dark:bg-gray-700"
-		>
-			<div className="font-semibold text-gray-800 dark:text-gray-200">
-				{comment.owner_name}
-			</div>
-			<div className="text-gray-600 dark:text-gray-300">{comment.content}</div>
-			<small className="block text-gray-500 dark:text-gray-400">
-				{new Date(comment.created_at).toLocaleString()}
-			</small>
-		</div>
-	)}
-/>
-*/
-function CommentSection(
-	{userCanCreateComments,value,onChange,onClick,comments,element}:CommentSectionProps
-)
-{
-	return <>
-		{/* Комментарии */}
-		<div className="space-y-4">
-			<h3 className="text-xl font-semibold">Comments</h3>
-			{/* Поле для добавления нового комментария */}
-			{
-				userCanCreateComments
-				&&<div className="space-y-2">
-					<textarea
-                        value={value}
-                        onChange={onChange}
-                        placeholder="Add a comment..."
-                        className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-gray-100"
-                    />
-                    <button
-                        onClick={onClick}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                    >
-                        Submit
-                    </button>
-                </div>
-			}
-			{/* Список комментариев */}
-			<div className="space-y-2">
-				{
-					comments.length>0
-					?comments.map(element)
-					:<p className="text-gray-500 dark:text-gray-400" children="No comments yet."/>
-				}
-			</div>
-		</div>
-	</>;
 }
 
 export default function EventCardPostOpen(
@@ -114,28 +35,12 @@ export default function EventCardPostOpen(
 	}:EventCardPostOpenProps
 )
 {
-	const [newComment,setNewComment]=useState('');
-	const {data,setData,post}=useForm(
-		{
-			comment:newComment
-		}
-	);
-
-	const filter=new Filter();
-
 	// console.log(filter.clean("Don't be an ash0le"));
-
-	const handleCommentSubmit=()=>{
-		if(newComment.trim()==='') return;
-		console.log('Submitting comment:',newComment);
-		post(route('comments.store',{event:event.id,comment:newComment}));
-		setNewComment(''); // Очистить поле после отправки
-	};
 
 	const participate=()=>{
 		console.info('can participate',event,user.id,canParticipate);
-		console.info('route',route('participants.store'));
-		router.post(route('participants.store'),{event_id:event.id,user_id:user.id});
+		// console.info('route',route('participants.store'));
+		// router.post(route('participants.store'),{event_id:event.id,user_id:user.id});
 	};
 	return (
 		<Dialog

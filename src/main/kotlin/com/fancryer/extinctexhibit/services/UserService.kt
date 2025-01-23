@@ -9,6 +9,8 @@ import com.fancryer.extinctexhibit.entities.User
 import com.fancryer.extinctexhibit.entities.UsersRole
 import com.fancryer.extinctexhibit.repositories.UserRepository
 import com.fancryer.extinctexhibit.repositories.UsersRoleRepository
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
@@ -71,6 +73,41 @@ class UserService(
 		{
 			e.left()
 		}
+
+	fun updateProsoponymEmail(email:String,newEmail:String,newProsoponym:String):HttpStatus
+	{
+		return transactionTemplate.execute {
+			userRepository.findByEmail(email)?.let {user->
+				val prosoponym=user.prosoponym!!
+				val id=user.id!!
+				when(newEmail to newProsoponym)
+				{
+					//ne = e, np = p
+					Pair(email,prosoponym)->NOT_MODIFIED
+					//ne != e, np = p
+					Pair(newEmail,prosoponym)->
+					{
+						if(userRepository.existsByEmail(newEmail))
+							CONFLICT
+						else
+							OK.also {
+								userRepository.updateEmailById(newEmail,id)
+							}
+					}
+					// ne = e, np != p
+					Pair(email,newProsoponym)->OK.also {
+						userRepository.updateProsoponymById(newProsoponym,id)
+					}
+					//ne != e, np != p
+					Pair(newEmail,newProsoponym)->OK.also {
+						userRepository.updateEmailAndProsoponymById(newEmail,newProsoponym,id)
+					}
+
+					else->INTERNAL_SERVER_ERROR
+				}
+			} ?: NOT_FOUND
+		} ?: INTERNAL_SERVER_ERROR
+	}
 
 	fun findByEmail(email:String):User?=
 		userRepository.findByEmail(email)

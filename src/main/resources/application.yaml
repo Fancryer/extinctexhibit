@@ -1,5 +1,12 @@
 server.port: 6060
 
+images:
+  upload:
+    path: src/main/resources/uploads
+  halls:
+    path: src/main/resources
+
+
 spring:
   application:
     name: extinctexhibit

@@ -1,11 +1,6 @@
-import ResponsiveNavLink from '../../Components/ResponsiveNavLink';
-import {Auth,Event}      from '../../types';
-import React             from 'react';
-import {TbBrandTabler}   from 'react-icons/tb';
-import {GiCheckedShield}                                                                            from 'react-icons/gi';
-import {BiCheck,BiSolidUserCheck,BiUserCheck,BiUserCircle,BiUserPin,BiUserPlus,BiUserVoice,BiUserX} from 'react-icons/bi';
-import {MdEvent,MdEventAvailable}                                                                   from 'react-icons/md';
-import {AiOutlineQuestion} from 'react-icons/ai';
+import ResponsiveNavLink        from '../../Components/ResponsiveNavLink';
+import {Auth,Event}             from '../../types';
+import {BiUserCheck,BiUserPlus} from 'react-icons/bi';
 
 interface EventCardPreOpenProps
 {
@@ -50,10 +45,10 @@ export default function EventCardPreOpen(
 				!participates
 				&&canParticipate
 				&&<BiUserPlus
-					onClick={()=>setIsOpen(true)}
-					className="self-start cursor-pointer"
-					size="1.5em"
-				/>
+                    onClick={()=>setIsOpen(true)}
+                    className="self-start cursor-pointer"
+                    size="1.5em"
+                />
 			}
 			<button onClick={()=>setIsOpen(true)}>
 				<h2 className="mb-2 text-lg font-bold text-gray-900 dark:text-gray-100">
@@ -77,26 +72,25 @@ export default function EventCardPreOpen(
 				{
 					userCanDeleteEvents
 					&&<div>
-						<ResponsiveNavLink
-							className="rounded-lg bg-red-200 hover:bg-red-300"
+                        <ResponsiveNavLink
+                            className="rounded-lg bg-red-200 hover:bg-red-300"
 							// href={route('events.delete',{event:event.id})}
-							children="Delete"
-						/>
-					</div>
+                            children="Delete"
+                        />
+                    </div>
 				}
 				{
 					userCanEditEvents
 					&&(new Date()<=new Date(start_time))
 					&&<div>
-						<ResponsiveNavLink
-							className="rounded-lg bg-violet-200 hover:bg-violet-300"
+                        <ResponsiveNavLink
+                            className="rounded-lg bg-violet-200 hover:bg-violet-300"
 							// href={route('events.edit',{event:event.id})}
-							children="Edit"
-						/>
-					</div>
+                            children="Edit"
+                        />
+                    </div>
 				}
 			</div>
 		}
-	</div>
-		;
+	</div>;
 }

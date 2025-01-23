@@ -1,12 +1,9 @@
 package com.fancryer.extinctexhibit.entities
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import com.fancryer.extinctexhibit.dtos.NewsDto
+import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
-import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.io.Serializable
@@ -17,7 +14,8 @@ import java.time.Instant
 class News:Serializable
 {
 	@Id
-	@ColumnDefault("nextval('news_id_seq')")
+	@GeneratedValue(strategy=GenerationType.SEQUENCE,generator="news_id_gen")
+	@SequenceGenerator(name="news_id_gen",sequenceName="news_id_seq",allocationSize=1)
 	@Column(name="id",nullable=false)
 	var id:Long?=null
 
@@ -41,5 +39,16 @@ class News:Serializable
 	companion object
 	{
 		private const val serialVersionUID=8663077991923162333L
+
+		infix fun News.toDto(coverUrl:String?)=NewsDto(
+			id!!,
+			title!!,
+			content!!,
+			createdAt!!,
+			updatedAt!!,
+			coverUrl
+		)
+
+		val News.dto get()=toDto(null)
 	}
 }

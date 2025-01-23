@@ -13,6 +13,7 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ParticipantsIndexImport } from './routes/participants/index'
 import { Route as NewsIndexImport } from './routes/news/index'
 import { Route as HallsIndexImport } from './routes/halls/index'
 import { Route as EventsIndexImport } from './routes/events/index'
@@ -20,6 +21,7 @@ import { Route as ProfileProfileIdImport } from './routes/profile.$profileId'
 import { Route as NewsCreateImport } from './routes/news/create'
 import { Route as AuthRegisterImport } from './routes/auth/register'
 import { Route as AuthLoginImport } from './routes/auth/login'
+import { Route as NewsEditNewsIdImport } from './routes/news/edit.$newsId'
 import { Route as AuthVerifyAccessTokenImport } from './routes/auth/verify.$accessToken'
 
 // Create Virtual Routes
@@ -33,6 +35,12 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const ParticipantsIndexRoute = ParticipantsIndexImport.update({
+  id: '/participants/',
+  path: '/participants/',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const NewsIndexRoute = NewsIndexImport.update({
   id: '/news/',
@@ -73,6 +81,12 @@ const AuthRegisterRoute = AuthRegisterImport.update({
 const AuthLoginRoute = AuthLoginImport.update({
   id: '/auth/login',
   path: '/auth/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const NewsEditNewsIdRoute = NewsEditNewsIdImport.update({
+  id: '/news/edit/$newsId',
+  path: '/news/edit/$newsId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -142,11 +156,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsIndexImport
       parentRoute: typeof rootRoute
     }
+    '/participants/': {
+      id: '/participants/'
+      path: '/participants'
+      fullPath: '/participants'
+      preLoaderRoute: typeof ParticipantsIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/auth/verify/$accessToken': {
       id: '/auth/verify/$accessToken'
       path: '/auth/verify/$accessToken'
       fullPath: '/auth/verify/$accessToken'
       preLoaderRoute: typeof AuthVerifyAccessTokenImport
+      parentRoute: typeof rootRoute
+    }
+    '/news/edit/$newsId': {
+      id: '/news/edit/$newsId'
+      path: '/news/edit/$newsId'
+      fullPath: '/news/edit/$newsId'
+      preLoaderRoute: typeof NewsEditNewsIdImport
       parentRoute: typeof rootRoute
     }
   }
@@ -163,7 +191,9 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsIndexRoute
   '/halls': typeof HallsIndexRoute
   '/news': typeof NewsIndexRoute
+  '/participants': typeof ParticipantsIndexRoute
   '/auth/verify/$accessToken': typeof AuthVerifyAccessTokenRoute
+  '/news/edit/$newsId': typeof NewsEditNewsIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -175,7 +205,9 @@ export interface FileRoutesByTo {
   '/events': typeof EventsIndexRoute
   '/halls': typeof HallsIndexRoute
   '/news': typeof NewsIndexRoute
+  '/participants': typeof ParticipantsIndexRoute
   '/auth/verify/$accessToken': typeof AuthVerifyAccessTokenRoute
+  '/news/edit/$newsId': typeof NewsEditNewsIdRoute
 }
 
 export interface FileRoutesById {
@@ -188,7 +220,9 @@ export interface FileRoutesById {
   '/events/': typeof EventsIndexRoute
   '/halls/': typeof HallsIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/participants/': typeof ParticipantsIndexRoute
   '/auth/verify/$accessToken': typeof AuthVerifyAccessTokenRoute
+  '/news/edit/$newsId': typeof NewsEditNewsIdRoute
 }
 
 export interface FileRouteTypes {
@@ -202,7 +236,9 @@ export interface FileRouteTypes {
     | '/events'
     | '/halls'
     | '/news'
+    | '/participants'
     | '/auth/verify/$accessToken'
+    | '/news/edit/$newsId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -213,7 +249,9 @@ export interface FileRouteTypes {
     | '/events'
     | '/halls'
     | '/news'
+    | '/participants'
     | '/auth/verify/$accessToken'
+    | '/news/edit/$newsId'
   id:
     | '__root__'
     | '/'
@@ -224,7 +262,9 @@ export interface FileRouteTypes {
     | '/events/'
     | '/halls/'
     | '/news/'
+    | '/participants/'
     | '/auth/verify/$accessToken'
+    | '/news/edit/$newsId'
   fileRoutesById: FileRoutesById
 }
 
@@ -237,7 +277,9 @@ export interface RootRouteChildren {
   EventsIndexRoute: typeof EventsIndexRoute
   HallsIndexRoute: typeof HallsIndexRoute
   NewsIndexRoute: typeof NewsIndexRoute
+  ParticipantsIndexRoute: typeof ParticipantsIndexRoute
   AuthVerifyAccessTokenRoute: typeof AuthVerifyAccessTokenRoute
+  NewsEditNewsIdRoute: typeof NewsEditNewsIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -249,7 +291,9 @@ const rootRouteChildren: RootRouteChildren = {
   EventsIndexRoute: EventsIndexRoute,
   HallsIndexRoute: HallsIndexRoute,
   NewsIndexRoute: NewsIndexRoute,
+  ParticipantsIndexRoute: ParticipantsIndexRoute,
   AuthVerifyAccessTokenRoute: AuthVerifyAccessTokenRoute,
+  NewsEditNewsIdRoute: NewsEditNewsIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -270,7 +314,9 @@ export const routeTree = rootRoute
         "/events/",
         "/halls/",
         "/news/",
-        "/auth/verify/$accessToken"
+        "/participants/",
+        "/auth/verify/$accessToken",
+        "/news/edit/$newsId"
       ]
     },
     "/": {
@@ -297,8 +343,14 @@ export const routeTree = rootRoute
     "/news/": {
       "filePath": "news/index.tsx"
     },
+    "/participants/": {
+      "filePath": "participants/index.tsx"
+    },
     "/auth/verify/$accessToken": {
       "filePath": "auth/verify.$accessToken.tsx"
+    },
+    "/news/edit/$newsId": {
+      "filePath": "news/edit.$newsId.tsx"
     }
   }
 }

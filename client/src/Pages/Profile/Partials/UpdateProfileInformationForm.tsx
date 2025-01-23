@@ -9,12 +9,11 @@ import {SubmitHandler,useForm}          from "react-hook-form";
 import api                              from "../../../api.tsx";
 import Cookies                          from "js-cookie";
 import {HttpStatusCode}                 from "axios";
+import {useAuth}                        from "../../../Components/AuthProvider.tsx";
 
 interface UpdateProfileInformationFormProps
 {
-	mustVerifyEmail:boolean,
-	className?:string,
-	auth:Auth
+	className?:string
 }
 
 interface UpdateProfileInformationFormState
@@ -24,24 +23,30 @@ interface UpdateProfileInformationFormState
 }
 
 export default function UpdateProfileInformationForm(
-	{mustVerifyEmail,className='',auth}:UpdateProfileInformationFormProps
+	{className=''}:UpdateProfileInformationFormProps
 )
 {
-	const {user,roles}=auth;
+	const {auth:{user,roles},clearAuth}=useAuth();
 	const [verificationIsSent,setVerificationIsSent]=useState(false);
 	const [verificationError,setVerificationError]=useState('');
 	const navigate=useNavigate();
 	const {
 		register,
 		handleSubmit,
-		formState:{errors,isSubmitting},
-		setError
+		formState:{errors,isSubmitting,isSubmitSuccessful}
 	}=useForm<UpdateProfileInformationFormState>();
 
 	const onSubmit:(SubmitHandler<UpdateProfileInformationFormState>)=
-		async e=>
+		async({prosoponym,email})=>
 		{
 			console.log('profile update');
+			await api.put('/user/update-prosoponym-email',{
+				accessToken:Cookies.get('accessToken')||'',
+				payload:    {prosoponym,email}
+			}).then(()=>{
+				clearAuth();
+				throw redirect({to:'/auth/login'});
+			});
 			// patch(route('profile.update'));
 		};
 	const sendVerification=async():Promise<void>=>{
@@ -66,12 +71,9 @@ export default function UpdateProfileInformationForm(
 								   }
 							   }
 						   }
-					 )
-					 .catch(
-						 e=>{
-							 setVerificationError(e)
-						 }
-					 );
+					 ).catch(e=>{
+					setVerificationError(e);
+				});
 			setVerificationIsSent(true);
 		}
 	}
@@ -107,7 +109,10 @@ export default function UpdateProfileInformationForm(
 				<input
 					className={`${textInputBaseClasses()} mt-1 p-2 block w-full h-8 border-2`}
 					placeholder="Your prosoponym"
-					{...register("prosoponym",{required:"Prosoponym is required"})}
+					{...register(
+						"prosoponym",
+						{required:"Prosoponym is required",value:user.prosoponym}
+					)}
 				/>
 				{errors.prosoponym&&<span className="text-red-600">{errors.prosoponym.message}</span>}
 			</div>
@@ -116,13 +121,23 @@ export default function UpdateProfileInformationForm(
 				<input
 					className={`${textInputBaseClasses()} mt-1 p-2 block w-full h-8 border-2`}
 					placeholder="Your email"
-					{...register("email",{required:"Email is required"})}
+					{...register(
+						"email",
+						{required:"Email is required",value:user.email}
+					)}
 				/>
 				{errors.email&&<span className="text-red-600">{errors.email.message}</span>}
 			</div>
 			{
-				mustVerifyEmail
-				&& !user.email_verified_at
+				user.emailVerifiedAt
+				&&<div className="mt-4">
+                    <p className="mt-2 text-md">
+                        Your email address is <span className="font-bold text-green-600">verified</span>.
+                    </p>
+                </div>
+			}
+			{
+				!user.emailVerifiedAt
 				&&<div>
                     <p className="mt-2 text-sm text-gray-800 dark:text-gray-200">
                         Your email address is unverified.
@@ -151,14 +166,11 @@ export default function UpdateProfileInformationForm(
 					}
                 </div>}
 			<div className="flex items-center gap-4">
-				<PrimaryButton
-					// disabled={processing}
-				>
+				<PrimaryButton disabled={isSubmitting}>
 					Save
 				</PrimaryButton>
 				<Transition
-					// show={recentlySuccessful}
-					show
+					show={isSubmitSuccessful}
 					enter="transition ease-in-out"
 					enterFrom="opacity-0"
 					leave="transition ease-in-out"

@@ -4,24 +4,23 @@ import findPermissionsInRoles from '../FindPermissionsInRoles';
 import EventCardPostOpen      from './EventCardPostOpen';
 import EventCardPreOpen       from './EventCardPreOpen';
 import api                    from "../../api.tsx";
+import {useAuth}              from "../../Components/AuthProvider.tsx";
 
 interface EventCardProps
 {
-	event:Event,
-	user:Auth['user']|null,
-	roles:Auth['roles']
+	event:Event
 }
 
-const truncate=(text:string,maxLength:number)=>
+export const truncate=(text:string,maxLength:number)=>
 	text.length>maxLength-3
 	?`${text.slice(0,maxLength-3).trimEnd()}...`
 	:text;
 
 export default function EventCard(
-	{event,user,roles}:EventCardProps
+	{event}:EventCardProps
 )
 {
-	console.info('participants',event.participants);
+	const {auth:{user,roles}}=useAuth();
 	const [userCanEditNews,userCanDeleteNews,userCanCreateComments]=
 		findPermissionsInRoles(user,roles,['edit news','delete news','create comments']);
 	const {id,organizer,hall,title,description,start_time,end_time}=event;
@@ -58,7 +57,6 @@ export default function EventCard(
 	return (
 		<div className="p-4 rounded-lg shadow-md dark:bg-gray-800 hover:shadow-lg transition-shadow bg-white w-96 max-w-lg mx-auto">
 			<EventCardPreOpen
-				setIsOpen={setIsOpen}
 				event={event}
 				user={user}
 				title={truncate(title,48)}
@@ -66,14 +64,13 @@ export default function EventCard(
 				description={truncate(description,42)}
 				start_time={start_time}
 				end_time={end_time}
-				userCanEditEvents={userCanEditNews}
-				userCanDeleteEvents={userCanDeleteNews}
 				participates={participates}
 				canParticipate={canParticipate}
+				setIsOpen={setIsOpen}
+				userCanEditEvents={userCanEditNews}
+				userCanDeleteEvents={userCanDeleteNews}
 			/>
 			<EventCardPostOpen
-				open={isOpen}
-				onClose={()=>setIsOpen(false)}
 				event={event}
 				user={user}
 				title={title}
@@ -82,9 +79,10 @@ export default function EventCard(
 				description={description}
 				startTime={start_time}
 				endTime={end_time}
-				userCanCreateComments={userCanCreateComments}
 				participates={participates}
 				canParticipate={canParticipate}
+				open={isOpen}
+				onClose={()=>setIsOpen(false)}
 			/>
 		</div>
 	)

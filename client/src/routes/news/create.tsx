@@ -1,16 +1,18 @@
-import {createFileRoute,useRouter}      from '@tanstack/react-router'
-import React,{useEffect,useState}       from "react";
-import {Transition}                     from "@headlessui/react";
-import AuthenticatedLayout              from "../../Layouts/AuthenticatedLayout.tsx";
-import {SubmitHandler,useForm}          from "react-hook-form";
-import Cookies                          from "js-cookie";
-import api,{extractData}                from "../../api.tsx";
-import InputLabel                       from "../../Components/InputLabel.tsx";
-import TextInput,{textInputBaseClasses} from "../../Components/TextInput.tsx";
-import {Event,Hall}                     from "../../types";
-import {useAuth}                        from '../../Components/AuthProvider.tsx';
-import FileInput                        from "../../Components/FileInput.tsx";
-import PrimaryButton                    from "../../Components/PrimaryButton.tsx";
+import {createFileRoute,useNavigate} from '@tanstack/react-router'
+import React,{useEffect,useState}    from "react";
+import {Transition}                  from "@headlessui/react";
+import AuthenticatedLayout           from "../../Layouts/AuthenticatedLayout.tsx";
+import {SubmitHandler,useForm}       from "react-hook-form";
+import Cookies                       from "js-cookie";
+import api,{extractData}             from "../../api.tsx";
+import InputLabel                    from "../../Components/InputLabel.tsx";
+import {textInputBaseClasses}        from "../../Components/TextInput.tsx";
+import {Event}                       from "../../types";
+import {useAuth}                     from '../../Components/AuthProvider.tsx';
+import FileInput                     from "../../Components/FileInput.tsx";
+import PrimaryButton                 from "../../Components/PrimaryButton.tsx";
+import {hasPermissionInRoles}        from "../../Pages/FindPermissionsInRoles.ts";
+import {AxiosError}                  from "axios";
 
 export const Route=
 	createFileRoute('/news/create')({component:NewsCreate})
@@ -23,62 +25,36 @@ export interface CreateNewsFormState
 	event_id:number|null;
 }
 
-function NewsCreate()
+function NewsCreateInner({events,onSubmit}:{events:Event[],onSubmit:SubmitHandler<CreateNewsFormState>})
 {
-	const [events,setEvents]=useState<Event[]>([]);
-	const [halls,setHalls]=useState<Hall[]>([]);
-	const router=useRouter();
-	const {auth:{user,roles}}=useAuth();
 	const {
 		register,
 		handleSubmit,
 		formState:{errors,isSubmitting,isSubmitSuccessful},
-		setError,
 		setValue
 	}=useForm<CreateNewsFormState>();
-
+	const {auth:{user,roles,state}}=useAuth();
+	const navigate=useNavigate();
 	useEffect(()=>{
-		const fetchEvents=async()=>
-			await api.get<Event[]>('events').then(extractData);
-		const fetchHalls=async()=>
-			await api.get<Hall[]>('halls').then(extractData);
-		fetchEvents().then(n=>setEvents(n));
-		fetchHalls().then(n=>setHalls(n));
-		// setFilteredEvents(filterEvents(eventFilter));
-	},[router,user,roles]);
-
-	const onSubmit:(SubmitHandler<CreateNewsFormState>)=
-		async({title,content,cover,event_id})=>
+		if(state==='ready'&&user===null)
 		{
-			try
-			{
-				console.warn(Cookies.get());
-				console.warn({title,content,cover,event_id});
-				// await api.post<CreateNewsFormState,AxiosResponse<AuthResponse>>(
-				// 	'auth',
-				// 	{email,password}
-				// ).then(r=>setAuthTokens(r.data));
-				// await navigate({from:'/auth/login',to:'/'});
-				console.log('logged in');
-			}
-			catch(error)
-			{
-				console.error('Login failed:',error);
-				// Показать пользователю сообщение об ошибке
-				alert('Login failed. Please check your credentials and try again.');
-				// setError(
-				// 	'email',
-				// 	{message:'Login failed. Please check your credentials and try again.'}
-				// );
-			}
-		};
-
-	return (
-		<AuthenticatedLayout
-			header={<div>Create News</div>}
-			isCentered
-		>
-			{/*<Head title="Create News"/>*/}
+			navigate(
+				{
+					from:   Route.path,
+					to:     '/auth/login',
+					replace:true
+				}
+			).then(()=>{
+				console.log(`Redirected to login because user is null`);
+			});
+		}
+	},[user,state,navigate]);
+	const userCanCreateNews=hasPermissionInRoles(user,roles,'create news');
+	if(state==='loading')
+		return <div>Loading...</div>; // Показываем индикатор загрузки
+	else if(state==='failed'||user===null|| !userCanCreateNews)
+		return <div>Redirecting...</div>; // Временный экран для редиректа
+	else return (
 			<section>
 				<header>
 					<h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -105,12 +81,14 @@ function NewsCreate()
 					</div>
 					<div className="mt-4">
 						<InputLabel htmlFor="content" value="Content"/>
-						<TextInput
-							className="mt-1 p-2 block w-full h-8 border-2 min-h-12"
+						<textarea
+							className={`${textInputBaseClasses()} mt-1 p-2 block w-full h-8 border-2 min-h-12`}
 							placeholder="Content"
-							multiline
+							aria-multiline
 							{...register("content",{required:"Content is required"})}
-						/>
+						>
+
+						</textarea>
 						{errors.content&&<span className="text-red-600">{errors.content.message}</span>}
 					</div>
 					<div className="mt-4">
@@ -164,6 +142,52 @@ function NewsCreate()
 					</div>
 				</form>
 			</section>
+		);
+}
+
+function NewsCreate()
+{
+	const [events,setEvents]=useState<Event[]>([]);
+	const navigate=useNavigate();
+	const [error,setError]=useState<string>('');
+	useEffect(()=>{
+		const fetchEvents=async()=>
+			await api.get<Event[]>('events').then(extractData);
+		fetchEvents().then(n=>setEvents(n));
+	},[]);
+	const onSubmit:(SubmitHandler<CreateNewsFormState>)=
+		async({title,content,cover,event_id})=>
+		{
+			try
+			{
+				console.warn(Cookies.get());
+				console.warn({title,content,cover,event_id});
+				const form=new FormData();
+				form.append('accessToken',Cookies.get('accessToken')||'');
+				form.append('title',title);
+				form.append('content',content);
+				if(cover) form.append('cover',cover);
+				if(event_id) form.append('event_id',`${event_id}`);
+				await api.post('news',form,{
+					headers:{'Content-Type':'multipart/form-data'}
+				}).then(async()=>{
+					await navigate({from:'/news/create',to:'/news'});
+				})
+				console.log('News created');
+			}
+			catch(error)
+			{
+				setError((error as AxiosError)?.message??'');
+			}
+		};
+	return (
+		<AuthenticatedLayout
+			header={<div>Create News</div>}
+			isCentered
+		>
+			{/*<Head title="Create News"/>*/}
+			<NewsCreateInner events={events} onSubmit={onSubmit}/>
+			{error&&<div className="text-red-600">{error}</div>}
 		</AuthenticatedLayout>
 	);
 }

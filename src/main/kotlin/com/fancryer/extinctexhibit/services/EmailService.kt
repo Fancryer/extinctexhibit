@@ -26,7 +26,7 @@ class EmailService(
 		{
 			val email=tokenService.extractEmail(accessToken)
 					  ?: throw NotFoundException("Email not found for the provided token")
-			val verificationUrl="http://localhost:5173/auth/verify?token=$accessToken"
+			val verificationUrl="http://localhost:5173/auth/verify/$accessToken"
 
 			SimpleMailMessage().apply {
 				setTo(email)

@@ -3,21 +3,11 @@ import NewsList               from '../../Pages/News/NewsList';
 import {hasPermissionInRoles} from '../../Pages/FindPermissionsInRoles';
 import AuthenticatedLayout    from '../../Layouts/AuthenticatedLayout';
 import ResponsiveNavLink      from '../../Components/ResponsiveNavLink';
-import {Comment}              from '../../types';
+import {Comment,NewsItem}     from '../../types';
 import {useEffect,useState}   from "react";
 import api                    from "../../api.tsx";
 import {useAuth}              from '../../Components/AuthProvider.tsx';
 import NavLink                from "../../Components/NavLink.tsx";
-
-export interface NewsItem
-{
-	id:number;
-	title:string;
-	content:string;
-	created_at:string;
-	cover_url?:string;
-	comments:[Comment];
-}
 
 export const Route=
 	createFileRoute('/news/')({component:NewsIndex})
@@ -38,6 +28,7 @@ export default function NewsIndex()
 	return (
 		<AuthenticatedLayout
 			isCentered
+			elseRedirectToLogin={false}
 			header={<YouCanAddNews newsArePresent={news.length>0}/>}
 		>
 			{/*<Head title="NewsIndex"/>*/}
@@ -54,7 +45,7 @@ function NewsIndexInner({news}:{news:NewsItem[]})
 		news.length>0
 		&&<div className="py-12">
             <div className="mx-auto max-w-full sm:px-6 lg:px-8">
-                <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                <div className="flex flex-col overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                     <NewsList news={news}/>
 					{
 						userCanCreateNews
@@ -63,7 +54,7 @@ function NewsIndexInner({news}:{news:NewsItem[]})
                                 className="rounded-lg"
                                 props={{to:'/news/create'}}
                             >
-                                Add event
+                                Add news
                             </ResponsiveNavLink>
                         </div>
 					}
@@ -80,9 +71,11 @@ function YouCanAddNews({newsArePresent}:{newsArePresent:boolean})
 	return (
 		!newsArePresent
 		&&userCanCreateNews
-		?<NavLink to='/news/create'>
+		?<NavLink to="/news/create">
 			There is no news yet, but you can add one
 		</NavLink>
-		:null
+		:<div className="text-2xl">
+			News page
+		</div>
 	);
 }

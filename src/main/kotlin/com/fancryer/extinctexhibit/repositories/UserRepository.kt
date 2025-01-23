@@ -20,4 +20,21 @@ interface UserRepository:JpaRepository<User,Long>
 	@Modifying
 	@Query("update User u set u.emailVerifiedAt = ?1 where u.email = ?2")
 	fun updateEmailVerifiedAtByEmail(emailVerifiedAt:Instant,email:String):Int
+
+	@Transactional
+	@Modifying
+	@Query("update User u set u.prosoponym = ?1 where u.id = ?2")
+	fun updateProsoponymById(prosoponym:String,id:Long):Int
+
+
+	@Transactional
+	@Modifying
+	@Query("update User u set u.email = ?1 where u.id = ?2")
+	fun updateEmailById(email:String,id:Long):Int
+
+
+	@Transactional
+	@Modifying
+	@Query("update User u set u.email = ?1, u.prosoponym = ?2 where u.id = ?3")
+	fun updateEmailAndProsoponymById(email:String,prosoponym:String,id:Long):Int
 }

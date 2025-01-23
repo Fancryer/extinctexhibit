@@ -1,8 +1,8 @@
-import {Auth} from '../types';
+import {MaybeAuth} from '../types';
 
 const findPermissionsInRoles=(
-	user:Auth['user']|null,
-	roles:Auth['roles'],
+	user:MaybeAuth['user'],
+	roles:MaybeAuth['roles'],
 	permissions:string[]
 )=>
 	user
@@ -14,14 +14,14 @@ const findPermissionsInRoles=(
 	:permissions.map((_)=>false);
 
 const hasPermissionInRoles=(
-	user:Auth['user']|null,
-	roles:Auth['roles'],
+	user:MaybeAuth['user'],
+	roles:MaybeAuth['roles'],
 	permission:string
 )=>findPermissionsInRoles(user,roles,[permission]).includes(true);
 
 const findCrudPermissionsInRoles=(
-	user:Auth['user']|null,
-	roles:Auth['roles'],
+	user:MaybeAuth['user'],
+	roles:MaybeAuth['roles'],
 	what:string
 )=>findPermissionsInRoles(
 	user,
