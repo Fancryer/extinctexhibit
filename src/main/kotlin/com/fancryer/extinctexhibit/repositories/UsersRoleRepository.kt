@@ -10,4 +10,7 @@ interface UsersRoleRepository:JpaRepository<UsersRole,Long>
 
 
 	fun existsByRole_IdAndUser_Email(id:Long,email:String):Boolean
+
+
+	fun deleteByUser_Id(id:Long):Long
 }

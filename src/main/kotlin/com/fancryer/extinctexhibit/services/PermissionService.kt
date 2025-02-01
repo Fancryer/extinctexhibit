@@ -1,7 +1,9 @@
 package com.fancryer.extinctexhibit.services
 
-import com.fancryer.extinctexhibit.controllers.RoleDto
+import com.fancryer.extinctexhibit.dtos.RoleDto
 import com.fancryer.extinctexhibit.entities.*
+import com.fancryer.extinctexhibit.repositories.PermissionRepository
+import com.fancryer.extinctexhibit.repositories.RolesPermissionRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate

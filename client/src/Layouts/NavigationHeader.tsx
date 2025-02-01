@@ -33,14 +33,13 @@ export default function NavigationHeader({user,roles,state}:MaybeAuth)
 			{userCanViewParticipants&&<HeaderLink name="/participants" text={'Participants'}/>}
 			{
 				userCanViewUsers
-				&&<HeaderLink name="/" /*users.index*/ text={'Users'}/>
+				&&<HeaderLink name="/users" text={'Users'}/>
 			}
 			{
 				user
 				&&<NavLink
                     to={`/profile/$profileId`}
                     params={{profileId:`${user.id}`}}
-					// active={route().current('profile.edit')}
                 >
                     Profile
                 </NavLink>

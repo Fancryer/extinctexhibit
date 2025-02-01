@@ -54,10 +54,8 @@
 //
 // export default NewsList;
 
-import ResponsiveNavLink                             from '@/Components/ResponsiveNavLink';
-import findPermissionsInRoles,{hasPermissionInRoles} from '@/Pages/FindPermissionsInRoles';
-import {Event,Auth}                                  from '@/types';
-import {useState}                                    from 'react';
+import {Event,Auth,Participant} from '../../types';
+import {useState}               from 'react';
 
 interface ParticipantsListProps
 {
@@ -75,9 +73,9 @@ export default function ParticipantsList({events,user,roles}:ParticipantsListPro
 		:text;
 
 	return (
-		<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 p-6">
+		<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-6">
 			{events.map((event,i)=>{
-				const {description,end_time,hall,id,organizer,participants,start_time,title}=event;
+				const {description,hall,organizer,participants,title}=event;
 				return (
 					<div
 						key={i}
@@ -98,9 +96,9 @@ export default function ParticipantsList({events,user,roles}:ParticipantsListPro
 							</small>
 							{participants.length?<ParticipantAccordion participants={participants}/>:null}
 							{!participants.length&&
-							 <div className="text-gray-700 dark:text-gray-300 mb-4">
-								 No participants
-							 </div>}
+                             <div className="text-gray-700 dark:text-gray-300 mb-4">
+                                 No participants
+                             </div>}
 						</div>
 					</div>
 				);
@@ -111,19 +109,18 @@ export default function ParticipantsList({events,user,roles}:ParticipantsListPro
 
 interface ParticipantAccordionProps
 {
-	participants:number[]
+	participants:Participant[];
 }
 
 function ParticipantAccordion({participants}:ParticipantAccordionProps)
 {
-	const [open,setOpen]=useState(false);
+	const [isOpen,setIsOpen]=useState(false);
 
 	return (
 		<div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 hover:shadow-lg transition-shadow">
+			{/* Header with toggle */}
 			<div
-				onClick={()=>{
-					setOpen(previousState=>!previousState);
-				}}
+				onClick={()=>setIsOpen((prevState)=>!prevState)}
 				className="flex justify-between items-center cursor-pointer"
 			>
 				<h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
@@ -131,7 +128,9 @@ function ParticipantAccordion({participants}:ParticipantAccordionProps)
 				</h2>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
-					className="h-6 w-6"
+					className={`h-6 w-6 transform transition-transform ${
+						isOpen?"rotate-180":"rotate-0"
+					}`}
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
@@ -144,17 +143,22 @@ function ParticipantAccordion({participants}:ParticipantAccordionProps)
 					/>
 				</svg>
 			</div>
-			{
-				open
-				&&participants.map(participant=>(
-					<div
-						key={participant}
-						className="text-gray-700 dark:text-gray-300 mb-4"
-					>
-						{participant}
-					</div>
-				))
-			}
+
+			{/* Accordion content */}
+			{isOpen&&(
+				<div className="mt-4 space-y-4">
+					{participants.map((participant)=>(
+						<div key={participant.id} className="text-gray-700 dark:text-gray-300">
+							<h3 className="font-semibold">{participant.id}</h3>
+							<ul className="pl-4 list-disc">
+								{participant.escorts.map((escort,index)=>(
+									<li key={index}>{escort}</li>
+								))}
+							</ul>
+						</div>
+					))}
+				</div>
+			)}
 		</div>
 	);
 }

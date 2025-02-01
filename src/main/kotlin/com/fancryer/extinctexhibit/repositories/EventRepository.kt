@@ -9,4 +9,7 @@ interface EventRepository:JpaRepository<Event,Long>
 	fun findAllByEndTimeLessThan(now:Instant):Set<Event>
 	fun findAllByStartTimeLessThanEqualAndEndTimeGreaterThanEqual(now:Instant,now2:Instant):Set<Event>
 	fun findAllByStartTimeGreaterThanEqual(now:Instant):Set<Event>
+
+
+	override fun deleteById(id:Long)
 }

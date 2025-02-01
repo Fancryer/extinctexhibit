@@ -1,6 +1,6 @@
 package com.fancryer.extinctexhibit.services
 
-import com.fancryer.extinctexhibit.controllers.RoleDto
+import com.fancryer.extinctexhibit.dtos.RoleDto
 import com.fancryer.extinctexhibit.entities.User
 import com.fancryer.extinctexhibit.entities.UsersRole
 import com.fancryer.extinctexhibit.repositories.UsersRoleRepository
@@ -24,7 +24,7 @@ class UsersRoleService(
 		return AuthInfo(user,roles)
 	}
 
-	private fun User.mapToInfoDto():UserInfoDto
+	fun User.mapToInfoDto():UserInfoDto
 	{
 		val id=id ?: throw IllegalStateException("User not found.")
 		val prosoponym=prosoponym ?: throw IllegalStateException("User not found.")

@@ -18,7 +18,14 @@ class FileController(
 {
 	@GetMapping("/uploads/{fileName:.+}")
 	fun getFile(@PathVariable fileName:String):(ResponseEntity<ByteArray>)=
-		File("${storageConfig.uploadPath}/$fileName").let(::loadFileEntity)
+		try
+		{
+			File("${storageConfig.uploadPath}/$fileName").let(::loadFileEntity)
+		}
+		catch(e:Exception)
+		{
+			ResponseEntity.notFound().build()
+		}
 
 	@GetMapping("/halls/{name}")
 	fun getHallFile(@PathVariable name:String):(ResponseEntity<ByteArray>)=

@@ -1,8 +1,6 @@
-import {createFileRoute,useRouter} from '@tanstack/react-router';
-
+import {createFileRoute,Link,useRouter}             from '@tanstack/react-router';
 import AuthenticatedLayout                          from '../../Layouts/AuthenticatedLayout';
-import ResponsiveNavLink                            from '../../Components/ResponsiveNavLink';
-import findPermissionsInRoles                       from '../../Pages/FindPermissionsInRoles';
+import {hasPermissionInRoles}                       from '../../Pages/FindPermissionsInRoles';
 import EventsList                                   from "../../Pages/Events/EventsList.tsx";
 import {Event,Hall}                                 from '../../types';
 import {Dispatch,SetStateAction,useEffect,useState} from 'react';
@@ -42,22 +40,21 @@ export default function EventsIndex()
 			future: true
 		}
 	);
-
-	useEffect(()=>{
-		const fetchEvents=async()=>
-			await api.get<Event[]>(
-				'events',
-				{
-					params:{
-						filter:eventFilterToByte(eventFilter),
-						now:   new Date().toISOString()
-					}
+	const fetchEvents=async()=>
+		await api.get<Event[]>(
+			'events',
+			{
+				params:{
+					filter:eventFilterToByte(eventFilter),
+					now:   new Date().toISOString()
 				}
-			).then(extractData);
-		const fetchHalls=async()=>
-			await api.get<Hall[]>('halls').then(extractData);
-		fetchEvents().then(setEvents);
-		fetchHalls().then(setHalls);
+			}
+		).then(extractData).then(setEvents);
+	const fetchHalls=async()=>
+		await api.get<Hall[]>('halls').then(extractData).then(setHalls);
+	useEffect(()=>{
+		fetchEvents().then();
+		fetchHalls().then();
 	},[router,eventFilter]);
 	return (
 		<AuthenticatedLayout
@@ -71,13 +68,14 @@ export default function EventsIndex()
 				</div>
 			}
 			elseRedirectToLogin={false}
-			isCentered
+			// isCentered
 		>
 			<EventsIndexInner
 				events={events}
 				halls={halls}
 				eventFilter={eventFilter}
 				setEventFilter={setEventFilter}
+				onEventDelete={async()=>fetchEvents().then(fetchHalls)}
 			/>
 		</AuthenticatedLayout>
 	);
@@ -88,15 +86,16 @@ interface EventsIndexInnerProps
 	events:Event[],
 	halls:Hall[],
 	eventFilter:EventFilter,
-	setEventFilter:Dispatch<SetStateAction<EventFilter>>
+	setEventFilter:Dispatch<SetStateAction<EventFilter>>,
+	onEventDelete:()=>Promise<void>
 }
 
-function EventsIndexInner({events,halls,eventFilter,setEventFilter}:EventsIndexInnerProps)
+function EventsIndexInner({events,halls,eventFilter,setEventFilter,onEventDelete}:EventsIndexInnerProps)
 {
-	const {auth:{user,roles,state}}=useAuth();
+	const {auth:{user,roles}}=useAuth();
 	const eventsArePresented=events.length>0;
 	const hallsArePresented=halls.length>0;
-	const [userCanCreateEvent,userCanCreateHall]=findPermissionsInRoles(user,roles,['create events','create halls']);
+	const userCanCreateEvent=hasPermissionInRoles(user,roles,'create events');
 	const updateEventFilter=
 		<T extends EventFilterType>(key:T,value:boolean)=>
 			setEventFilter(prev=>({...prev,[key]:value}));
@@ -108,9 +107,7 @@ function EventsIndexInner({events,halls,eventFilter,setEventFilter}:EventsIndexI
 			 ?'Present'
 			 :'Future';
 	return (
-
-		events.length>0
-		?<div className="py-12">
+		<div className="py-12">
 			<div className="mx-auto max-w-full sm:px-6 lg:px-8">
 				<div className="flex flex-col overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
 					<div className="flex flex-wrap gap-6 p-6">
@@ -129,22 +126,21 @@ function EventsIndexInner({events,halls,eventFilter,setEventFilter}:EventsIndexI
 							</div>
 						))}
 					</div>
-					<EventsList events={events}/>
+					{eventsArePresented&&<EventsList events={events} onEventDelete={onEventDelete}/>}
 					{
 						userCanCreateEvent
 						&&hallsArePresented
 						&&<div className="p-4 dark:bg-gray-800 transition-shadow w-36 self-end">
-                            <ResponsiveNavLink
+                            <Link
                                 className="rounded-lg"
-								// href={route('events.create')}
+                                to="/events/create"
                             >
                                 Add event
-                            </ResponsiveNavLink>
+                            </Link>
                         </div>
 					}
 				</div>
 			</div>
 		</div>
-		:null
 	)
 }

@@ -1,6 +1,6 @@
 package com.fancryer.extinctexhibit.services
 
-import com.fancryer.extinctexhibit.controllers.RoleDto
+import com.fancryer.extinctexhibit.dtos.RoleDto
 import com.fancryer.extinctexhibit.entities.Role
 import com.fancryer.extinctexhibit.entities.RoleRepository
 import org.springframework.stereotype.Service

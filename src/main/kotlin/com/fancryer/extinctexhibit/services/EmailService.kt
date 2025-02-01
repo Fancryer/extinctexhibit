@@ -6,6 +6,8 @@ import arrow.core.right
 import com.fancryer.extinctexhibit.repositories.UserRepository
 import io.jsonwebtoken.ExpiredJwtException
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.mail.MailParseException
 import org.springframework.mail.MailSender
 import org.springframework.mail.SimpleMailMessage
@@ -33,16 +35,15 @@ class EmailService(
 				replyTo="fancryer2003@gmail.com"
 				subject="Verify your account"
 				text="Click the link to verify your account: $verificationUrl"
-			}.run(mailSender::send)
-			Unit.right()
+			}.run(mailSender::send).right()
 		}
 		catch(e:MailParseException)
 		{
-			(HttpStatus.BAD_REQUEST to (e.message ?: "Invalid email")).left()
+			(BAD_REQUEST to (e.message ?: "Invalid email")).left()
 		}
 		catch(e:ExpiredJwtException)
 		{
-			(HttpStatus.UNAUTHORIZED to "Token expired").left()
+			(UNAUTHORIZED to "Token expired").left()
 		}
 
 	fun verifyEmail(token:String):(Either<Exception,Unit>)=

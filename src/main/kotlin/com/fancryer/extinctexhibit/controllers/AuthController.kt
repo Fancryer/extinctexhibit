@@ -6,14 +6,11 @@ import com.fancryer.extinctexhibit.services.AuthenticationService
 import com.fancryer.extinctexhibit.services.TokenService
 import com.fancryer.extinctexhibit.services.UsersRoleService
 import io.jsonwebtoken.ExpiredJwtException
-import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Size
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-import java.io.Serializable
 
 @RestController
 @RequestMapping("/api/auth")
@@ -40,9 +37,8 @@ class AuthController(
 		authenticationService.getUserRoles(accessToken)
 
 	@GetMapping("/info")
-	fun getAuthInfo(@RequestParam accessToken:String):ResponseEntity<AuthInfo?>
-	{
-		return try
+	fun getAuthInfo(@RequestParam accessToken:String):(ResponseEntity<AuthInfo?>)=
+		try
 		{
 			tokenService.extractEmail(accessToken)?.let {
 				usersRoleService.getInfoByEmail(it)
@@ -52,22 +48,10 @@ class AuthController(
 		{
 			ResponseEntity.of(ProblemDetail.forStatusAndDetail(FORBIDDEN,e.message)).build()
 		}
-	}
 
 	private fun String.mapToTokenResponse():TokenResponse=
 		TokenResponse(this)
 }
-
-data class RoleDto(
-	val id:Long,
-
-	@field:NotNull
-	@field:Size(max=255)
-	val name:String,
-
-	@field:NotNull
-	val permissions:(List<@Size(max=255) String>)=emptyList()
-):Serializable
 
 data class AuthenticationRequest(
 	val email:String,

@@ -8,7 +8,7 @@ interface FileInputProps
 	name:string,
 	accept?:string,
 	onChange?:(file:File|null)=>void,
-	defaultValue?:File,
+	defaultValue?:File|null,
 	register:(
 		name:'cover',
 		options?:RegisterOptions<CreateNewsFormState,'cover'>
@@ -46,11 +46,11 @@ const FileInput:FC<FileInputProps>=(
 		register,
 		errors,
 		setValue,
-		defaultValue
+		defaultValue=null
 	}:FileInputProps
 )=>{
 	const [canvas,_]=useState<CanvasRenderingContext2D|null>(document.createElement('canvas').getContext('2d'));
-	const [selectedFile,setSelectedFile]=useState<File|null>(defaultValue||null);
+	const [selectedFile,setSelectedFile]=useState<File|null>(defaultValue);
 	const [dragging,setDragging]=useState(false);
 	const [filePreview,setFilePreview]=useState<string|null>(null);
 	const [averageColor,setAverageColor]=useState<Uint8ClampedArray|null>(null);
@@ -106,8 +106,8 @@ const FileInput:FC<FileInputProps>=(
 		<div
 			className={
 				`mt-1 flex items-center justify-center border-2 ${
-					dragging?'border-dashed border-blue-500':'border-gray-300'
-				} rounded-lg bg-gray-100 p-4 cursor-pointer`
+				dragging?'border-dashed border-blue-500':'border-gray-300'
+			} rounded-lg bg-gray-100 p-4 cursor-pointer`
 			}
 			style={{
 				backgroundImage:   filePreview?`url(${filePreview})`:undefined,
@@ -135,7 +135,7 @@ const FileInput:FC<FileInputProps>=(
 					style={{
 						borderColor:averageColor
 									?`rgba(${averageColor.join(',')},0.8)`
-									:undefined
+						:undefined
 					}}
 				>
 					<div className="text-sm font-medium text-gray-700 flex flex-row justify-between items-center">

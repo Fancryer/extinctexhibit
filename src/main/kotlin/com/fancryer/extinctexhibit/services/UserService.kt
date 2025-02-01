@@ -7,8 +7,7 @@ import arrow.core.toOption
 import com.fancryer.extinctexhibit.entities.RoleRepository
 import com.fancryer.extinctexhibit.entities.User
 import com.fancryer.extinctexhibit.entities.UsersRole
-import com.fancryer.extinctexhibit.repositories.UserRepository
-import com.fancryer.extinctexhibit.repositories.UsersRoleRepository
+import com.fancryer.extinctexhibit.repositories.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -23,7 +22,10 @@ class UserService(
 	private val encoder:PasswordEncoder,
 	private val usersRoleRepository:UsersRoleRepository,
 	private val transactionTemplate:TransactionTemplate,
-	private val roleRepository:RoleRepository
+	private val roleRepository:RoleRepository,
+	private val commentRepository:CommentRepository,
+	private val escortRepository:EscortRepository,
+	private val participantRepository:ParticipantRepository
 )
 {
 	fun createUser(user:User):(Either<Throwable,User>)=
@@ -42,8 +44,15 @@ class UserService(
 
 	fun findAll():(List<User>)=userRepository.findAll()
 
-	fun deleteById(id:Long):Unit=
+	fun deleteById(id:Long)=transactionTemplate.execute {
+		usersRoleRepository.deleteByUser_Id(id)
+		commentRepository.deleteByUser_Id(id)
+		escortRepository.findByParticipant_User_Id(id).forEach {
+			escortRepository.deleteById(it.id!!)
+		}
+		participantRepository.deleteByUser_Id(id)
 		userRepository.deleteById(id)
+	} ?: Unit
 
 	fun existsById(id:Long):Boolean=
 		userRepository.existsById(id)

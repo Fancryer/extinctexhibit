@@ -1,7 +1,7 @@
-import React,{useEffect,useState}             from 'react'
+import {useEffect,useState}                   from 'react'
 import {createFileRoute,redirect,useNavigate} from '@tanstack/react-router'
 import api,{extractData}                      from '../../api.tsx'
-import {AxiosError,HttpStatusCode}            from 'axios'
+import {AxiosError}                           from 'axios'
 import AuthenticatedLayout                    from '../../Layouts/AuthenticatedLayout.tsx'
 import {useAuth}                              from "../../Components/AuthProvider.tsx";
 import {hasPermissionInRoles}                 from "../../Pages/FindPermissionsInRoles.ts";
@@ -11,7 +11,6 @@ import FileInput                              from "../../Components/FileInput.t
 import PrimaryButton                          from "../../Components/PrimaryButton.tsx";
 import {Transition}                           from "@headlessui/react";
 import {SubmitHandler,useForm}                from "react-hook-form";
-import {CreateNewsFormState}                  from "./create.tsx";
 import {Event,NewsItem}                       from "../../types"
 import Cookies                                from "js-cookie";
 
@@ -30,11 +29,11 @@ function EditNews()
 			await api.get<NewsItem>(`news/${newsId}`).then(extractData);
 		const fetchEvents=async()=>
 			await api.get<Event[]>('events').then(extractData);
-		fetchNews().then(n=>{
+		fetchNews().then(async n=>{
 			setNews(n);
-			if(n==null) throw redirect({to:"/news"});
+			if(n==null) await navigate({to:"/news"});
 		});
-		fetchEvents().then(n=>setEvents(n));
+		fetchEvents().then(setEvents);
 	},[]);
 	const onSubmit:(SubmitHandler<EditNewsFormState>)=
 		async({title,content,cover,eventId})=>
@@ -171,16 +170,16 @@ function EditNewsInner({news,events,onSubmit}:EditNewsInnerProps)
 								No events available
 							</div>
 							:<select
-								{...register("event_id")}
+								{...register("eventId")}
 								className="p-2 block w-full border-2 rounded-md"
 							>
 								<option key="none" value="null">
 									None
 								</option>
-								{events.map(({id,title,start_time,end_time})=>(
+								{events.map(({id,title,startTime,endTime})=>(
 									<option key={id} value={id}>
-										{title} ({new Date(start_time).toLocaleString()} -{" "}
-										{new Date(end_time).toLocaleString()})
+										{title} ({new Date(startTime).toLocaleString()} -{" "}
+										{new Date(endTime).toLocaleString()})
 									</option>
 								))}
 							</select>

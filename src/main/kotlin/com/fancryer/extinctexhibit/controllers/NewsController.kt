@@ -56,6 +56,11 @@ class NewsController(
 			}
 		} ?: error("Invalid access token")
 
+	@DeleteMapping
+	fun delete(@RequestParam newsId:Long):(ResponseEntity<String>)=
+			newsService.deleteNews(newsId)
+				.let {ResponseEntity.ok("News deleted successfully")}
+
 
 	data class CreateNewsRequest(
 		val title:String,

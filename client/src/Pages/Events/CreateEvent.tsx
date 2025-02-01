@@ -27,15 +27,8 @@ interface CreateEventFormState
 	hall_id?:number,
 	title:string,
 	description:string,
-	// min_date:string,
-	// max_date:string,
 	start_time:string,
 	end_time:string
-}
-
-const removeLeading=(str:string,char:string):string=>
-{
-	return str[0]===char?str.slice(1):str;
 }
 
 export default function CreateEvent({incoming_events,halls}:CreateEventProps)

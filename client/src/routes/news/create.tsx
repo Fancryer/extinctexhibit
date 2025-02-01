@@ -107,10 +107,10 @@ function NewsCreateInner({events,onSubmit}:{events:Event[],onSubmit:SubmitHandle
 								<option key="none" value="null">
 									None
 								</option>
-								{events.map(({id,title,start_time,end_time})=>(
+								{events.map(({id,title,startTime,endTime})=>(
 									<option key={id} value={id}>
-										{title} ({new Date(start_time).toLocaleString()} -{" "}
-										{new Date(end_time).toLocaleString()})
+										{title} ({new Date(startTime).toLocaleString()} -{" "}
+										{new Date(endTime).toLocaleString()})
 									</option>
 								))}
 							</select>

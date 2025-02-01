@@ -3,7 +3,7 @@ package com.fancryer.extinctexhibit.services
 import com.fancryer.extinctexhibit.configs.StorageConfig
 import com.fancryer.extinctexhibit.entities.News
 import com.fancryer.extinctexhibit.entities.NewsCover
-import com.fancryer.extinctexhibit.entities.NewsCoverRepository
+import com.fancryer.extinctexhibit.repositories.NewsCoverRepository
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File

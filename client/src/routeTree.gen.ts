@@ -13,12 +13,14 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as UsersIndexImport } from './routes/users/index'
 import { Route as ParticipantsIndexImport } from './routes/participants/index'
 import { Route as NewsIndexImport } from './routes/news/index'
 import { Route as HallsIndexImport } from './routes/halls/index'
 import { Route as EventsIndexImport } from './routes/events/index'
 import { Route as ProfileProfileIdImport } from './routes/profile.$profileId'
 import { Route as NewsCreateImport } from './routes/news/create'
+import { Route as EventsCreateImport } from './routes/events/create'
 import { Route as AuthRegisterImport } from './routes/auth/register'
 import { Route as AuthLoginImport } from './routes/auth/login'
 import { Route as NewsEditNewsIdImport } from './routes/news/edit.$newsId'
@@ -35,6 +37,12 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const UsersIndexRoute = UsersIndexImport.update({
+  id: '/users/',
+  path: '/users/',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const ParticipantsIndexRoute = ParticipantsIndexImport.update({
   id: '/participants/',
@@ -69,6 +77,12 @@ const ProfileProfileIdRoute = ProfileProfileIdImport.update({
 const NewsCreateRoute = NewsCreateImport.update({
   id: '/news/create',
   path: '/news/create',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const EventsCreateRoute = EventsCreateImport.update({
+  id: '/events/create',
+  path: '/events/create',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -121,6 +135,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterImport
       parentRoute: typeof rootRoute
     }
+    '/events/create': {
+      id: '/events/create'
+      path: '/events/create'
+      fullPath: '/events/create'
+      preLoaderRoute: typeof EventsCreateImport
+      parentRoute: typeof rootRoute
+    }
     '/news/create': {
       id: '/news/create'
       path: '/news/create'
@@ -163,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParticipantsIndexImport
       parentRoute: typeof rootRoute
     }
+    '/users/': {
+      id: '/users/'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/auth/verify/$accessToken': {
       id: '/auth/verify/$accessToken'
       path: '/auth/verify/$accessToken'
@@ -186,12 +214,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/events/create': typeof EventsCreateRoute
   '/news/create': typeof NewsCreateRoute
   '/profile/$profileId': typeof ProfileProfileIdRoute
   '/events': typeof EventsIndexRoute
   '/halls': typeof HallsIndexRoute
   '/news': typeof NewsIndexRoute
   '/participants': typeof ParticipantsIndexRoute
+  '/users': typeof UsersIndexRoute
   '/auth/verify/$accessToken': typeof AuthVerifyAccessTokenRoute
   '/news/edit/$newsId': typeof NewsEditNewsIdRoute
 }
@@ -200,12 +230,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/events/create': typeof EventsCreateRoute
   '/news/create': typeof NewsCreateRoute
   '/profile/$profileId': typeof ProfileProfileIdRoute
   '/events': typeof EventsIndexRoute
   '/halls': typeof HallsIndexRoute
   '/news': typeof NewsIndexRoute
   '/participants': typeof ParticipantsIndexRoute
+  '/users': typeof UsersIndexRoute
   '/auth/verify/$accessToken': typeof AuthVerifyAccessTokenRoute
   '/news/edit/$newsId': typeof NewsEditNewsIdRoute
 }
@@ -215,12 +247,14 @@ export interface FileRoutesById {
   '/': typeof IndexLazyRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/events/create': typeof EventsCreateRoute
   '/news/create': typeof NewsCreateRoute
   '/profile/$profileId': typeof ProfileProfileIdRoute
   '/events/': typeof EventsIndexRoute
   '/halls/': typeof HallsIndexRoute
   '/news/': typeof NewsIndexRoute
   '/participants/': typeof ParticipantsIndexRoute
+  '/users/': typeof UsersIndexRoute
   '/auth/verify/$accessToken': typeof AuthVerifyAccessTokenRoute
   '/news/edit/$newsId': typeof NewsEditNewsIdRoute
 }
@@ -231,12 +265,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth/login'
     | '/auth/register'
+    | '/events/create'
     | '/news/create'
     | '/profile/$profileId'
     | '/events'
     | '/halls'
     | '/news'
     | '/participants'
+    | '/users'
     | '/auth/verify/$accessToken'
     | '/news/edit/$newsId'
   fileRoutesByTo: FileRoutesByTo
@@ -244,12 +280,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth/login'
     | '/auth/register'
+    | '/events/create'
     | '/news/create'
     | '/profile/$profileId'
     | '/events'
     | '/halls'
     | '/news'
     | '/participants'
+    | '/users'
     | '/auth/verify/$accessToken'
     | '/news/edit/$newsId'
   id:
@@ -257,12 +295,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth/login'
     | '/auth/register'
+    | '/events/create'
     | '/news/create'
     | '/profile/$profileId'
     | '/events/'
     | '/halls/'
     | '/news/'
     | '/participants/'
+    | '/users/'
     | '/auth/verify/$accessToken'
     | '/news/edit/$newsId'
   fileRoutesById: FileRoutesById
@@ -272,12 +312,14 @@ export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
+  EventsCreateRoute: typeof EventsCreateRoute
   NewsCreateRoute: typeof NewsCreateRoute
   ProfileProfileIdRoute: typeof ProfileProfileIdRoute
   EventsIndexRoute: typeof EventsIndexRoute
   HallsIndexRoute: typeof HallsIndexRoute
   NewsIndexRoute: typeof NewsIndexRoute
   ParticipantsIndexRoute: typeof ParticipantsIndexRoute
+  UsersIndexRoute: typeof UsersIndexRoute
   AuthVerifyAccessTokenRoute: typeof AuthVerifyAccessTokenRoute
   NewsEditNewsIdRoute: typeof NewsEditNewsIdRoute
 }
@@ -286,12 +328,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
+  EventsCreateRoute: EventsCreateRoute,
   NewsCreateRoute: NewsCreateRoute,
   ProfileProfileIdRoute: ProfileProfileIdRoute,
   EventsIndexRoute: EventsIndexRoute,
   HallsIndexRoute: HallsIndexRoute,
   NewsIndexRoute: NewsIndexRoute,
   ParticipantsIndexRoute: ParticipantsIndexRoute,
+  UsersIndexRoute: UsersIndexRoute,
   AuthVerifyAccessTokenRoute: AuthVerifyAccessTokenRoute,
   NewsEditNewsIdRoute: NewsEditNewsIdRoute,
 }
@@ -309,12 +353,14 @@ export const routeTree = rootRoute
         "/",
         "/auth/login",
         "/auth/register",
+        "/events/create",
         "/news/create",
         "/profile/$profileId",
         "/events/",
         "/halls/",
         "/news/",
         "/participants/",
+        "/users/",
         "/auth/verify/$accessToken",
         "/news/edit/$newsId"
       ]
@@ -327,6 +373,9 @@ export const routeTree = rootRoute
     },
     "/auth/register": {
       "filePath": "auth/register.tsx"
+    },
+    "/events/create": {
+      "filePath": "events/create.tsx"
     },
     "/news/create": {
       "filePath": "news/create.tsx"
@@ -345,6 +394,9 @@ export const routeTree = rootRoute
     },
     "/participants/": {
       "filePath": "participants/index.tsx"
+    },
+    "/users/": {
+      "filePath": "users/index.tsx"
     },
     "/auth/verify/$accessToken": {
       "filePath": "auth/verify.$accessToken.tsx"

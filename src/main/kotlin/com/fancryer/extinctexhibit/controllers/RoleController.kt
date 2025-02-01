@@ -1,5 +1,6 @@
 package com.fancryer.extinctexhibit.controllers
 
+import com.fancryer.extinctexhibit.dtos.RoleDto
 import com.fancryer.extinctexhibit.entities.Role
 import com.fancryer.extinctexhibit.entities.RoleRepository
 import com.fancryer.extinctexhibit.entities.RolesPermission

@@ -1,6 +1,8 @@
 import {ChangeEvent,useEffect,useState} from 'react';
 import InputLabel                       from './InputLabel';
 import TextInput                        from './TextInput';
+import {CreateEventsFormState}          from "../routes/events/create.tsx";
+import {UseFormRegister}                from "react-hook-form";
 
 interface DateRangePickerProps
 {
@@ -8,12 +10,13 @@ interface DateRangePickerProps
 	maxDate:string,
 	onChange:(startDate:string,endDate:string)=>void,
 	formatDateToInput:(date:Date)=>string,
+	register:UseFormRegister<CreateEventsFormState>,
 	className?:string,
 	disabled?:boolean
 }
 
 export default function DateRangePicker(
-	{minDate,maxDate,onChange,className='',disabled=false}:DateRangePickerProps
+	{minDate,maxDate,onChange,register,className='',disabled=false}:DateRangePickerProps
 )
 {
 	const [localStartDate,setLocalStartDate]=useState(minDate);
@@ -29,7 +32,7 @@ export default function DateRangePicker(
 	);
 
 	const handleStartDateChange=(e:ChangeEvent<HTMLTextAreaElement|HTMLInputElement>)=>{
-		const newStartDate=e.target.value;
+		const newStartDate=new Date(e.target.value).toISOString().slice(0,-8);
 		setLocalStartDate(newStartDate);
 
 		// Проверяем, что начальная дата не позже конечной
@@ -45,7 +48,7 @@ export default function DateRangePicker(
 	};
 
 	const handleEndDateChange=(e:ChangeEvent<HTMLTextAreaElement|HTMLInputElement>)=>{
-		const newEndDate=e.target.value;
+		const newEndDate=new Date(e.target.value).toISOString().slice(0,-8);
 		setLocalEndDate(newEndDate);
 
 		// Проверяем, что конечная дата не раньше начальной
@@ -55,7 +58,8 @@ export default function DateRangePicker(
 		}
 		else
 		{
-			e.target.setCustomValidity('End date cannot be earlier than start date');
+			console.log({localStartDate,newEndDate})
+			// e.target.setCustomValidity('End date cannot be earlier than start date');
 			onChange(newEndDate,newEndDate);
 			setLocalStartDate(newEndDate);
 		}
@@ -70,22 +74,21 @@ export default function DateRangePicker(
 					Start Date
 				</InputLabel>
 				{
-					!disabled
-					?<TextInput
-						id="start-date"
-						type="datetime-local"
-						value={!disabled?localStartDate:'--'}
-						min={minDate}
-						onChange={handleStartDateChange}
-						className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-						required
-						disabled={disabled}
-					/>
-					:<input
+					disabled
+					?<input
 						className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
 						disabled
 					>
 					</input>
+					:<input
+						id="start-date"
+						type="datetime-local"
+						value={localStartDate}
+						min={minDate}
+						onChange={handleStartDateChange}
+						className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+						required
+					/>
 				}
 			</div>
 			<div>
@@ -95,17 +98,24 @@ export default function DateRangePicker(
 				>
 					End Date
 				</InputLabel>
-				<TextInput
-					id="end-date"
-					type="datetime-local"
-					value={!disabled?localEndDate:'--'}
-					min={localStartDate}
-					max={maxDate}
-					onChange={handleEndDateChange}
-					className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-					required
-					disabled={disabled}
-				/>
+				{
+					disabled
+					?<input
+						className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+						disabled
+					>
+					</input>
+					:<TextInput
+						id="end-date"
+						type="datetime-local"
+						value={localEndDate}
+						min={localStartDate}
+						max={maxDate}
+						onChange={handleEndDateChange}
+						className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+						required
+					/>
+				}
 			</div>
 		</div>
 	);

@@ -4,12 +4,9 @@ import com.fancryer.extinctexhibit.controllers.NewsController.CreateNewsRequest
 import com.fancryer.extinctexhibit.controllers.NewsController.UpdateNewsRequest
 import com.fancryer.extinctexhibit.dtos.NewsDto
 import com.fancryer.extinctexhibit.entities.EventsNews
-import com.fancryer.extinctexhibit.entities.EventsNewsRepository
 import com.fancryer.extinctexhibit.entities.News
 import com.fancryer.extinctexhibit.entities.News.Companion.toDto
-import com.fancryer.extinctexhibit.entities.NewsCoverRepository
-import com.fancryer.extinctexhibit.repositories.EventRepository
-import com.fancryer.extinctexhibit.repositories.NewsRepository
+import com.fancryer.extinctexhibit.repositories.*
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
@@ -22,7 +19,8 @@ class NewsService(
 	private val transactionTemplate:TransactionTemplate,
 	private val eventRepository:EventRepository,
 	private val eventsNewsRepository:EventsNewsRepository,
-	private val newsCoverRepository:NewsCoverRepository
+	private val newsCoverRepository:NewsCoverRepository,
+	private val commentRepository:CommentRepository
 )
 {
 	fun findAll():(Set<NewsDto>)=
@@ -104,5 +102,20 @@ class NewsService(
 			}
 		}
 	}
+
+	fun deleteNews(
+		newsId:Long
+	):Boolean=transactionTemplate.execute {
+		eventsNewsRepository.deleteByNews_Id(newsId)
+		commentRepository.deleteByNews_Id(newsId)
+		newsCoverRepository.findByNews_Id(newsId)
+			.getOrNull()
+			?.let {
+				fileStorageService.deleteFile(it.coverPath!!)
+				newsCoverRepository.delete(it)
+			}
+		newsRepository.deleteById(newsId)
+		true
+	} ?: false
 
 }

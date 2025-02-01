@@ -1,5 +1,6 @@
-package com.fancryer.extinctexhibit.entities
+package com.fancryer.extinctexhibit.repositories
 
+import com.fancryer.extinctexhibit.entities.RolesPermission
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface RolesPermissionRepository:JpaRepository<RolesPermission,Long>

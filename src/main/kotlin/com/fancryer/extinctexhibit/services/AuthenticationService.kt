@@ -3,7 +3,7 @@ package com.fancryer.extinctexhibit.services
 import com.fancryer.extinctexhibit.configs.JwtProperties
 import com.fancryer.extinctexhibit.controllers.AuthenticationRequest
 import com.fancryer.extinctexhibit.controllers.AuthenticationResponse
-import com.fancryer.extinctexhibit.controllers.RoleDto
+import com.fancryer.extinctexhibit.dtos.RoleDto
 import com.fancryer.extinctexhibit.entities.UsersRole
 import com.fancryer.extinctexhibit.repositories.RefreshTokenRepository
 import com.fancryer.extinctexhibit.repositories.UsersRoleRepository
@@ -31,11 +31,11 @@ class AuthenticationService(
 			println("Authenticating: $it")
 			authManager.authenticate(it)
 		}.run {
-			userDetailsService.loadUserByUsername(request.email).let {user->
+			userDetailsService.loadUserByUsername(request.email).let {
 				AuthenticationResponse(
-					createAccessToken(user),
-					createRefreshToken(user).also {
-						refreshTokenRepository.save(it,user)
+					createAccessToken(it),
+					createRefreshToken(it).also {token->
+						refreshTokenRepository.save(token,it)
 					}
 				)
 			}
@@ -51,15 +51,13 @@ class AuthenticationService(
 				null
 		}
 
-	fun getUserRoles(accessToken:String):List<UsersRole>
-	{
-		return tokenService.extractEmail(accessToken)?.let {
+	fun getUserRoles(accessToken:String):(List<UsersRole>)=
+		tokenService.extractEmail(accessToken)?.let {
 			val currentUserDetails=userDetailsService.loadUserByUsername(it)
 			currentUserDetails.username.let {
 				usersRoleRepository.findByUser_Email(it)
 			}
 		}.orEmpty()
-	}
 
 	private fun createAccessToken(user:UserDetails)=
 		tokenService.generate(user,getAccessTokenExpiration())

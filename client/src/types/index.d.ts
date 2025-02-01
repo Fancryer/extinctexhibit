@@ -55,11 +55,17 @@ export interface Event
 	id:number,
 	organizer:string,
 	hall:Hall,
-	participants:number[],
+	participants:Participant[],
 	title:string,
 	description:string,
-	start_time:string,
-	end_time:string
+	startTime:Date,
+	endTime:Date
+}
+
+export interface Participant
+{
+	id:number,
+	escorts:string[]
 }
 
 export interface NewsItem

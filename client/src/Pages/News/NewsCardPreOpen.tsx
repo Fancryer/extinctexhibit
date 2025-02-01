@@ -1,7 +1,9 @@
 import React,{useState}  from "react";
 import ResponsiveNavLink from "../../Components/ResponsiveNavLink.tsx";
-import {NewsCardProps}   from "./NewsCard.tsx";
-import {Link}            from "@tanstack/react-router";
+import {NewsCardProps}    from "./NewsCard.tsx";
+import {Link,useNavigate} from "@tanstack/react-router";
+import api                from "../../api.tsx";
+import Cookies           from "js-cookie";
 
 interface NewsCardPreOpenProps extends Omit<NewsCardProps,'userCanCreateComments'>
 {
@@ -25,6 +27,25 @@ export function NewsCardPreOpen(
 	const [isCoverPreviewOpen,setIsCoverPreviewOpen]=useState(false);
 	const handleImageClick=()=>setIsCoverPreviewOpen(true);
 	const handleCloseCoverPreview=()=>setIsCoverPreviewOpen(false);
+	const navigate=useNavigate();
+	async function handleDelete(e:React.MouseEvent<HTMLButtonElement>)
+	{
+		e.preventDefault();
+		console.debug('deleting news: ',newsId);
+		await api.delete('/news',{
+			params:{
+				accessToken:Cookies.get('accessToken')||'',
+				newsId
+			}
+		}).then(()=>{
+			navigate({to:"/news"})
+		})
+		// await api.delete(`/news/${newsId}`)
+		// 		 .then(async()=>{
+		// 			 await onNewsDelete();
+		// 			 await router.navigate({replace:true})
+		// 		 })
+	}
 
 	return (
 		<>
@@ -64,6 +85,7 @@ export function NewsCardPreOpen(
 						userCanDeleteNews
 						&&<button
                             className="px-4 py-2 rounded-lg bg-red-300 hover:bg-red-400 text-white transition-colors"
+							onClick={handleDelete}
                         >
                             Delete
                         </button>

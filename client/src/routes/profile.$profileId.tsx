@@ -1,8 +1,6 @@
 import {createFileRoute,redirect,useNavigate} from '@tanstack/react-router';
 import AuthenticatedLayout                    from "../Layouts/AuthenticatedLayout.tsx";
 import UpdateProfileInformationForm           from "../Pages/Profile/Partials/UpdateProfileInformationForm.tsx";
-import UpdatePasswordForm                     from "../Pages/Profile/Partials/UpdatePasswordForm.tsx";
-import DeleteUserForm                         from "../Pages/Profile/Partials/DeleteUserForm.tsx";
 import {useAuth}                              from "../Components/AuthProvider.tsx";
 import {useEffect}                            from "react";
 
@@ -27,7 +25,7 @@ function Profile()
 
 function ProfileInner({id}:{id:number})
 {
-	const {auth:{user,roles,state}}=useAuth();
+	const {auth:{user,state}}=useAuth();
 	const navigate=useNavigate();
 	useEffect(()=>{
 		if(state==='ready'&&(user===null||user.id!==id))
@@ -49,12 +47,6 @@ function ProfileInner({id}:{id:number})
 				<div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
 					<div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
 						<UpdateProfileInformationForm className="max-w-xl"/>
-					</div>
-					<div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
-						<UpdatePasswordForm className="max-w-xl"/>
-					</div>
-					<div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
-						<DeleteUserForm className="max-w-xl"/>
 					</div>
 				</div>
 			</div>

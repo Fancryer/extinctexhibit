@@ -3,7 +3,7 @@ package com.fancryer.extinctexhibit.services
 import com.fancryer.extinctexhibit.dtos.CommentDto
 import com.fancryer.extinctexhibit.entities.Comment
 import com.fancryer.extinctexhibit.entities.Comment.Companion.dto
-import com.fancryer.extinctexhibit.entities.CommentRepository
+import com.fancryer.extinctexhibit.repositories.CommentRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 

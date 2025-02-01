@@ -1,10 +1,10 @@
-import {createFileRoute,useRouter} from '@tanstack/react-router'
-import React,{useEffect,useState}  from "react";
-import {useAuth}                   from '../../Components/AuthProvider';
-import {Event,Hall}                from "../../types";
-import AuthenticatedLayout         from "../../Layouts/AuthenticatedLayout.tsx";
-import ParticipantsList            from "../../Pages/Participants/ParticipantsList.tsx";
-import api,{extractData}           from "../../api.tsx";
+import {createFileRoute,redirect,useRouter} from '@tanstack/react-router'
+import {useEffect,useState}                 from "react";
+import {useAuth}                            from '../../Components/AuthProvider';
+import {Event}                              from "../../types";
+import AuthenticatedLayout                  from "../../Layouts/AuthenticatedLayout.tsx";
+import ParticipantsList                     from "../../Pages/Participants/ParticipantsList.tsx";
+import api,{extractData}                    from "../../api.tsx";
 
 export const Route=
 	createFileRoute('/participants/')({component:ParticipantsIndex});
@@ -20,7 +20,6 @@ function ParticipantsIndex()
 				</h2>
 			</div>}
 		>
-			{/*<Head title="ParticipantsIndex"/>*/}
 			<ParticipantsIndexInner/>
 		</AuthenticatedLayout>
 	);

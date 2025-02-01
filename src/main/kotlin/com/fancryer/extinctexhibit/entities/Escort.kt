@@ -8,24 +8,23 @@ import java.io.Serializable
 import java.time.Instant
 
 @Entity
-@Table(name="participants")
-class Participant:Serializable
+@Table(name="escorts")
+class Escort:Serializable
 {
 	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE,generator="participants_id_gen")
-	@SequenceGenerator(name="participants_id_gen",sequenceName="participants_id_seq",allocationSize=1)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE,generator="escorts_id_gen")
+	@SequenceGenerator(name="escorts_id_gen",sequenceName="escorts_id_seq",allocationSize=1)
 	@Column(name="id",nullable=false)
-	var id:Long?=null
+	var id:Int?=null
 
 	@NotNull
 	@ManyToOne(fetch=FetchType.LAZY,optional=false)
-	@JoinColumn(name="user_id",nullable=false)
-	var user:User?=null
+	@JoinColumn(name="participant_id",nullable=false)
+	var participant:Participant?=null
 
 	@NotNull
-	@ManyToOne(fetch=FetchType.LAZY,optional=false)
-	@JoinColumn(name="event_id",nullable=false)
-	var event:Event?=null
+	@Column(name="prosoponym",nullable=false,length=Integer.MAX_VALUE)
+	var prosoponym:String?=null
 
 	@Column(name="created_at")
 	@CreationTimestamp
@@ -37,6 +36,6 @@ class Participant:Serializable
 
 	companion object
 	{
-		private const val serialVersionUID=4007343080000398514L
+		private const val serialVersionUID=5760518749275409442L
 	}
 }

@@ -26,6 +26,10 @@ spring:
     port: 2525
     username: c07176d5a286b2
     password: 45ce5090f329be
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 jwt:
   key:

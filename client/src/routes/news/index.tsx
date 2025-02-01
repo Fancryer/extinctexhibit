@@ -1,4 +1,4 @@
-import {createFileRoute}      from '@tanstack/react-router'
+import {createFileRoute,Link} from '@tanstack/react-router'
 import NewsList               from '../../Pages/News/NewsList';
 import {hasPermissionInRoles} from '../../Pages/FindPermissionsInRoles';
 import AuthenticatedLayout    from '../../Layouts/AuthenticatedLayout';
@@ -50,12 +50,12 @@ function NewsIndexInner({news}:{news:NewsItem[]})
 					{
 						userCanCreateNews
 						&&<div className="p-4 dark:bg-gray-800 transition-shadow w-36 self-end">
-                            <ResponsiveNavLink
+                            <NavLink
                                 className="rounded-lg"
-                                props={{to:'/news/create'}}
+                                to='/news/create'
                             >
                                 Add news
-                            </ResponsiveNavLink>
+                            </NavLink>
                         </div>
 					}
                 </div>

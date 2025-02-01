@@ -1,40 +1,56 @@
-import ResponsiveNavLink        from '../../Components/ResponsiveNavLink';
-import {Auth,Event}             from '../../types';
-import {BiUserCheck,BiUserPlus} from 'react-icons/bi';
+import ResponsiveNavLink         from '../../Components/ResponsiveNavLink';
+import {Event}                   from '../../types';
+import {BiUserCheck,BiUserPlus}  from 'react-icons/bi';
+import findPermissionsInRoles    from "../FindPermissionsInRoles.ts";
+import {useAuth}                 from "../../Components/AuthProvider.tsx";
+import {Link,useRouter}          from "@tanstack/react-router";
+import React,{MouseEventHandler} from "react";
+import api                       from "../../api.tsx";
 
 interface EventCardPreOpenProps
 {
 	setIsOpen:(open:boolean)=>void,
 	event:Event,
-	user:Auth['user']|null,
-	organizer:string,
-	title:string,
-	description:string,
-	start_time:string,
-	end_time:string,
-	userCanEditEvents:boolean,
-	userCanDeleteEvents:boolean,
 	participates:boolean,
-	canParticipate:boolean
+	canParticipate:boolean,
+	onEventDelete:()=>Promise<void>
 }
 
 export default function EventCardPreOpen(
 	{
 		setIsOpen,
 		event,
-		user,
-		organizer,
-		title,
-		description,
-		start_time,
-		end_time,
-		userCanEditEvents,
-		userCanDeleteEvents,
 		participates,
-		canParticipate
+		canParticipate,
+		onEventDelete
 	}:EventCardPreOpenProps
 )
 {
+	const {auth:{user,roles}}=useAuth();
+	const router=useRouter();
+	const [userCanEditEvents,userCanDeleteEvents]=
+		findPermissionsInRoles(user,roles,['edit events','delete events']);
+	const countEventParticipants=
+		(event:Event):number=>
+			event.participants
+				 .map(p=>p.escorts.length+1)
+				 .reduce((a,b)=>a+b,0);
+	const dateToGbDate=(date:Date)=>
+		date.toLocaleDateString("en-GB",{hour:"2-digit",minute:"2-digit"})
+	const localizedStartTime=dateToGbDate(new Date(event.startTime));
+	const localizedEndTime=dateToGbDate(new Date(event.endTime));
+
+	async function handleDelete(e:React.MouseEvent<HTMLButtonElement>)
+	{
+		e.preventDefault();
+		console.debug('deleting event: ',event);
+		await api.delete(`/events/${event.id}`)
+				 .then(async()=>{
+					 await onEventDelete();
+					 await router.navigate({replace:true});
+				 })
+	}
+
 	return <div className="flex flex-col h-full">
 		<div className="flex flex-col justify-evenly h-full">
 			{
@@ -52,19 +68,20 @@ export default function EventCardPreOpen(
 			}
 			<button onClick={()=>setIsOpen(true)}>
 				<h2 className="mb-2 text-lg font-bold text-gray-900 dark:text-gray-100">
-					{title} by {organizer}
+					{event.title} by {event.organizer}
 				</h2>
 			</button>
 			<div className="text-gray-700 dark:text-gray-300 mb-4 flex-grow">
-				{description}
+				{event.description}
 			</div>
-			<div className="text-gray-700 dark:text-gray-300 mb-4 flex-grow self-center">
-				{`${event.participants.length} / ${event.hall.capacity}`}
+			<div className="text-gray-700 dark:text-gray-300 mb-4 flex flex-row justify-between">
+				<div>Participants:</div>
+				{`${countEventParticipants(event)} / ${event.hall.capacity}`}
 			</div>
 			<small className="flex justify-between mt-auto text-sm text-gray-500 dark:text-gray-400">
-				<div>{start_time}</div>
+				<div>{localizedStartTime}</div>
 				<span>-</span>
-				<div>{end_time}</div>
+				<div>{localizedEndTime}</div>
 			</small>
 		</div>
 		{
@@ -72,21 +89,10 @@ export default function EventCardPreOpen(
 				{
 					userCanDeleteEvents
 					&&<div>
-                        <ResponsiveNavLink
-                            className="rounded-lg bg-red-200 hover:bg-red-300"
-							// href={route('events.delete',{event:event.id})}
+                        <button
+                            className="rounded-lg p-1 bg-red-200 hover:bg-red-300 text-red-900"
+                            onClick={handleDelete}
                             children="Delete"
-                        />
-                    </div>
-				}
-				{
-					userCanEditEvents
-					&&(new Date()<=new Date(start_time))
-					&&<div>
-                        <ResponsiveNavLink
-                            className="rounded-lg bg-violet-200 hover:bg-violet-300"
-							// href={route('events.edit',{event:event.id})}
-                            children="Edit"
                         />
                     </div>
 				}

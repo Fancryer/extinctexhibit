@@ -2,7 +2,9 @@ package com.fancryer.extinctexhibit.controllers
 
 import com.fancryer.extinctexhibit.entities.User
 import com.fancryer.extinctexhibit.services.TokenService
+import com.fancryer.extinctexhibit.services.UserInfoDto
 import com.fancryer.extinctexhibit.services.UserService
+import com.fancryer.extinctexhibit.services.UsersRoleService
 import org.apache.coyote.BadRequestException
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -27,7 +29,8 @@ data class CreateUserResponse(
 @RequestMapping("/api/user")
 class UserController(
 	private val userService:UserService,
-	private val tokenService:TokenService
+	private val tokenService:TokenService,
+	private val usersRoleService:UsersRoleService
 )
 {
 	@PostMapping
@@ -36,6 +39,14 @@ class UserController(
 			.fold({throw ResponseStatusException(BAD_REQUEST,it.message)}) {
 				it.toResponse()
 			}
+
+	@GetMapping("/all")
+	fun index():(List<UserInfoDto>)=
+		userService.findAll().map {
+			usersRoleService.run {
+				it.mapToInfoDto()
+			}
+		}
 
 	@GetMapping
 	fun listAll():(List<CreateUserResponse>)=

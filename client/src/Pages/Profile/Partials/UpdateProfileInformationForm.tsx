@@ -1,15 +1,14 @@
-import {Transition}                     from '@headlessui/react';
-import {FormEventHandler,useState}      from 'react';
-import {Auth}                           from "../../../types";
-import InputLabel                       from "../../../Components/InputLabel.tsx";
-import TextInput,{textInputBaseClasses} from "../../../Components/TextInput.tsx";
-import {Link,redirect,useNavigate}      from "@tanstack/react-router";
-import PrimaryButton                    from '../../../Components/PrimaryButton.tsx';
-import {SubmitHandler,useForm}          from "react-hook-form";
-import api                              from "../../../api.tsx";
-import Cookies                          from "js-cookie";
-import {HttpStatusCode}                 from "axios";
-import {useAuth}                        from "../../../Components/AuthProvider.tsx";
+import {Transition}                from '@headlessui/react';
+import {useState}                  from 'react';
+import InputLabel                  from "../../../Components/InputLabel.tsx";
+import {textInputBaseClasses}      from "../../../Components/TextInput.tsx";
+import {Link,redirect,useNavigate} from "@tanstack/react-router";
+import PrimaryButton               from '../../../Components/PrimaryButton.tsx';
+import {SubmitHandler,useForm}     from "react-hook-form";
+import api                         from "../../../api.tsx";
+import Cookies                     from "js-cookie";
+import {HttpStatusCode}            from "axios";
+import {useAuth}                   from "../../../Components/AuthProvider.tsx";
 
 interface UpdateProfileInformationFormProps
 {
@@ -27,6 +26,7 @@ export default function UpdateProfileInformationForm(
 )
 {
 	const {auth:{user,roles},clearAuth}=useAuth();
+	if(!user) throw redirect({to:'/auth/login'});
 	const [verificationIsSent,setVerificationIsSent]=useState(false);
 	const [verificationError,setVerificationError]=useState('');
 	const navigate=useNavigate();
@@ -129,7 +129,7 @@ export default function UpdateProfileInformationForm(
 				{errors.email&&<span className="text-red-600">{errors.email.message}</span>}
 			</div>
 			{
-				user.emailVerifiedAt
+				user?.emailVerifiedAt
 				&&<div className="mt-4">
                     <p className="mt-2 text-md">
                         Your email address is <span className="font-bold text-green-600">verified</span>.
@@ -137,7 +137,7 @@ export default function UpdateProfileInformationForm(
                 </div>
 			}
 			{
-				!user.emailVerifiedAt
+				!user?.emailVerifiedAt
 				&&<div>
                     <p className="mt-2 text-sm text-gray-800 dark:text-gray-200">
                         Your email address is unverified.
